@@ -163,6 +163,7 @@ When using this example for your own Nx workspace, you may need to adjust the fo
 - Update workflow files in `.github/workflows/` to match your repository and application structure
 - Add additional checks or remove unnecessary ones from the `checks.yml` file
 - Update image names in `build-images.yml` (e.g. `nx-multi-app`) to match your project
+- In `build-images.yml` adjust platforms if you need to support different architectures (e.g. `linux/amd64,linux/arm64`), you can remove the `platforms` line if you want to build only for the current architecture which is usually the best option if you don't have a specific need for multi-architecture builds. In this example I am deploying to Raspberry Pi which requires `linux/arm64` support.
 - When using the `deploy-to-production.yml`, use the images built by the `build-images.yml` workflow
 
 ### Installation (Local Development)

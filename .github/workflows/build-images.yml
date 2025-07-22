@@ -39,7 +39,7 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}/nx-multi-app:latest
             ghcr.io/${{ github.repository }}/nx-multi-app:${{ github.sha }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64 # linux/arm64 for ARM devices like Raspberry Pi
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

@@ -36,17 +36,6 @@ jobs:
       deployment-url: ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}
 
     steps:
-      - name: Checkout repository # To remove?
-        uses: actions/checkout@v3
-
-      - name: Set up Cloudflared
-        run: |
-          echo "☁️ Setting up Cloudflare tunnel..."
-          sudo mkdir -p --mode=0755 /usr/share/keyrings
-          curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
-          echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared jammy main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
-          sudo apt-get update && sudo apt-get install cloudflared
-
       - name: Setup SSH Configuration
         run: |
           echo "🔐 Setting up SSH configuration..."
@@ -101,13 +90,9 @@ jobs:
 
           echo "✅ Deployment completed successfully"
 
-          # Verify container is running
-          echo "� Verifying container status..."
-          docker ps --filter "name=$CONTAINER_NAME" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-
           # Health check
           echo "🏥 Performing health check..."
-          sleep 10
+          sleep 5 # Wait for the container to start
           if docker ps --filter "name=$CONTAINER_NAME" --filter "status=running" | grep -q $CONTAINER_NAME; then
             echo "✅ Container is running successfully"
           else
