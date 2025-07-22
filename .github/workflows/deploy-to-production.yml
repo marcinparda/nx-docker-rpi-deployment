@@ -60,6 +60,9 @@ jobs:
           EOF
           chmod 600 ~/.ssh/config
 
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Deploy to Raspberry Pi
         id: deploy
         env:
