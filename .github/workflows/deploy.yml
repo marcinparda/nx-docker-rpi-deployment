@@ -20,3 +20,4 @@ jobs:
     secrets:
       CLOUDFLARE_TUNNEL_DOMAIN: ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}
       API_URL: ${{ secrets.API_URL }}
+      RASPBERRY_PI_USERNAME: ${{ secrets.RASPBERRY_PI_USERNAME }}
