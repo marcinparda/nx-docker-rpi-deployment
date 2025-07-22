@@ -19,5 +19,6 @@ jobs:
       image-name: '${{ needs.build-images.outputs.image_name }}'
     secrets:
       CLOUDFLARE_TUNNEL_DOMAIN: ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}
-      API_URL: ${{ secrets.API_URL }}
       RASPBERRY_PI_USERNAME: ${{ secrets.RASPBERRY_PI_USERNAME }}
+      RASPBERRY_PI_SSH_KEY: ${{ secrets.RASPBERRY_PI_SSH_KEY }}
+      SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}

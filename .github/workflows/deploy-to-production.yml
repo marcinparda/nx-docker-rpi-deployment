@@ -10,9 +10,11 @@ on:
     secrets:
       CLOUDFLARE_TUNNEL_DOMAIN:
         required: true
-      API_URL:
-        required: true
       RASPBERRY_PI_USERNAME:
+        required: true
+      RASPBERRY_PI_SSH_KEY:
+        required: true
+      SSH_KNOWN_HOSTS:
         required: true
   workflow_dispatch:
     inputs:
@@ -75,7 +77,6 @@ jobs:
 
           IMAGE_NAME="${{ env.IMAGE_NAME }}"
           CONTAINER_NAME="${{ env.CONTAINER_NAME }}"
-          API_URL="${{ secrets.API_URL }}"
 
           echo "� Stopping existing container if running..."
           docker stop $CONTAINER_NAME 2>/dev/null || true
@@ -93,7 +94,6 @@ jobs:
             --restart unless-stopped \
             -p 4200:80 \
             -p 4201:81 \
-            -e API_URL="$API_URL" \
             $IMAGE_NAME
 
           echo "✅ Deployment completed successfully"
