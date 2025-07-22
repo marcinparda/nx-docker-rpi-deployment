@@ -2,6 +2,10 @@ name: Build Images
 
 on:
   workflow_call:
+    outputs:
+      image_name:
+        description: "The built Docker image name"
+        value: ${{ jobs.build-images.outputs.image_name }}
   workflow_dispatch:
 
 jobs:
