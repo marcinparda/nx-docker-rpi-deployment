@@ -100,26 +100,11 @@ jobs:
       - name: Deployment Summary
         run: |
           echo "# 🚀 Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 📊 Deployment Details" >> $GITHUB_STEP_SUMMARY
-          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| **Status** | ${{ needs.deploy-to-production.outputs.deployment-status == 'success' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Image** | \`${{ needs.deploy-to-production.outputs.image-name }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Target** | Raspberry Pi via ${{ needs.deploy-to-production.outputs.deployment-url }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Workflow** | ${{ github.workflow }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Run ID** | ${{ github.run_id }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Triggered by** | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
           if [[ "${{ needs.deploy-to-production.outputs.deployment-status }}" == "success" ]]; then
             echo "## 🎉 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "Your application has been successfully deployed to the Raspberry Pi." >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### 🔗 Access URLs" >> $GITHUB_STEP_SUMMARY
-            echo "- **App 1**: http://${{ needs.deploy-to-production.outputs.deployment-url }}:4200" >> $GITHUB_STEP_SUMMARY
-            echo "- **App 2**: http://${{ needs.deploy-to-production.outputs.deployment-url }}:4201" >> $GITHUB_STEP_SUMMARY
           else
             echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
