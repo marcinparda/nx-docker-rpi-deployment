@@ -7,18 +7,18 @@ on:
         description: 'Docker image name to deploy'
         required: false
         type: string
-    secrets:
-      RASPBERRY_PI_SSH_KEY:
-        required: true
-      SSH_KNOWN_HOSTS:
-        required: true
-      CLOUDFLARE_TUNNEL_DOMAIN:
-        required: true
-      RASPBERRY_PI_USERNAME:
-        required: true
-      API_URL:
-        description: 'Production API URL for environment configuration'
-        required: true
+    # secrets:
+    #   RASPBERRY_PI_SSH_KEY:
+    #     required: true
+    #   SSH_KNOWN_HOSTS:
+    #     required: true
+    #   CLOUDFLARE_TUNNEL_DOMAIN:
+    #     required: true
+    #   RASPBERRY_PI_USERNAME:
+    #     required: true
+    #   API_URL:
+    #     description: 'Production API URL for environment configuration'
+    #     required: true
   workflow_dispatch:
     inputs:
       image-name:
@@ -72,6 +72,10 @@ jobs:
           IMAGE_NAME="${{ env.IMAGE_NAME }}"
           CONTAINER_NAME="${{ env.CONTAINER_NAME }}"
           API_URL="${{ secrets.API_URL }}"
+          RASPBERRY_PI_SSH_KEY="${{ secrets.RASPBERRY_PI_SSH_KEY }}"
+          SSH_KNOWN_HOSTS="${{ secrets.SSH_KNOWN_HOSTS }}"
+          CLOUDFLARE_TUNNEL_DOMAIN="${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}"
+          RASPBERRY_PI_USERNAME="${{ secrets.RASPBERRY_PI_USERNAME }}"
 
           echo "� Stopping existing container if running..."
           docker stop $CONTAINER_NAME 2>/dev/null || true
