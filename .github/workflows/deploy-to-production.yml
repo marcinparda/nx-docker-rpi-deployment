@@ -44,66 +44,40 @@ jobs:
           echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared jammy main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
           sudo apt-get update && sudo apt-get install cloudflared
 
-      - name: Setup SSH Key
+      - name: Setup SSH Configuration
         run: |
+          echo "🔐 Setting up SSH configuration..."
           mkdir -p ~/.ssh
           echo "${{ secrets.RASPBERRY_PI_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          cat <<EOF > ~/.ssh/config
+          Host ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}
+            User ${{ secrets.RASPBERRY_PI_USERNAME }}
+            IdentityFile ~/.ssh/id_ed25519
+            ProxyCommand cloudflared access ssh --hostname %h
+            StrictHostKeyChecking no
+          EOF
+          chmod 600 ~/.ssh/config
 
       - name: Deploy to Raspberry Pi
         id: deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "🚀 Starting deployment to Raspberry Pi..."
-          echo "📦 Deploying image: ${{ env.IMAGE_NAME }}"
-
-          echo "📝 Creating deployment script..."
-          cat << 'EOF' > deploy.sh
-          #!/bin/bash
-          set -e
-
-          echo "🔑 Logging in to GitHub Container Registry..."
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-          IMAGE_NAME="${{ env.IMAGE_NAME }}"
-          CONTAINER_NAME="${{ env.CONTAINER_NAME }}"
-
-          echo "� Stopping existing container if running..."
-          docker stop $CONTAINER_NAME 2>/dev/null || true
-          docker rm $CONTAINER_NAME 2>/dev/null || true
-
-          echo "🗑️ Cleaning up old images..."
-          docker image prune -f
-
-          echo "📥 Pulling latest image..."
-          docker pull $IMAGE_NAME
-
-          echo "� Starting new container..."
-          docker run -d \
-            --name $CONTAINER_NAME \
-            --restart unless-stopped \
-            -p 4200:80 \
-            -p 4201:81 \
-            $IMAGE_NAME
-
-          echo "✅ Deployment completed successfully"
-
-          # Health check
-          echo "🏥 Performing health check..."
-          sleep 5 # Wait for the container to start
-          if docker ps --filter "name=$CONTAINER_NAME" --filter "status=running" | grep -q $CONTAINER_NAME; then
-            echo "✅ Container is running successfully"
-          else
-            echo "❌ Container failed to start"
-            docker logs $CONTAINER_NAME
-            exit 1
-          fi
-          EOF
 
           echo "📤 Copying deployment script to Raspberry Pi..."
           scp deploy.sh ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:~/deploy.sh
-          echo "🔑 Executing deployment script on Raspberry Pi..."
-          ssh ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "chmod +x ~/deploy.sh && ~/deploy.sh"
+
+          echo "⚡️ Executing deployment script on Raspberry Pi..."
+          ssh ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} \
+            "chmod +x ~/deploy.sh && \
+            GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}' \
+            IMAGE_NAME='${{ env.IMAGE_NAME }}' \
+            CONTAINER_NAME='${{ env.CONTAINER_NAME }}' \
+            GITHUB_ACTOR='${{ github.actor }}' \
+            ~/deploy.sh"
 
           echo "🎉 Deployment to Raspberry Pi completed successfully!"
 
