@@ -4,7 +4,57 @@
 
 ✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/react-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+This workspace demonstrates Nx monorepo capabilities with Docker deployment setup for Raspberry Pi.
+
+## 🏗️ Project Structure
+
+This workspace contains:
+
+- **app-1** - React application that uses both `shared-lib` and `app-1-lib`
+- **app-2** - React application that uses only `shared-lib`
+- **shared-lib** - Shared library used by both applications
+- **app-1-lib** - Library specific to app-1
+
+## 🐳 Docker Deployment
+
+### Quick Start
+
+Build and run all applications using Docker:
+
+```sh
+# Using the provided script
+./docker-build.sh
+
+# Or using docker-compose directly
+docker-compose up --build -d
+```
+
+Applications will be available at:
+
+- **App 1**: http://localhost:4200
+- **App 2**: http://localhost:4201
+
+### Using Makefile
+
+```sh
+# Build containers
+make build
+
+# Start containers
+make up
+
+# View logs
+make logs
+
+# Stop containers
+make down
+
+# Clean up
+make clean
+
+# Show all available commands
+make help
+```
 
 ## Run tasks
 
@@ -89,12 +139,13 @@ Nx Console is an editor extension that enriches your developer experience. It le
 
 Learn more:
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/react-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
+- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/react-monorepo-tutorial?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
 And join the Nx community:
+
 - [Discord](https://go.nx.dev/community)
 - [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
 - [Our Youtube channel](https://www.youtube.com/@nxdevtools)

@@ -3,7 +3,7 @@
   "include": [],
   "references": [
     {
-      "path": "../shared-lib"
+      "path": "../../libs/shared-lib"
     },
     {
       "path": "./tsconfig.app.json"
@@ -12,5 +12,5 @@
       "path": "./tsconfig.spec.json"
     }
   ],
-  "extends": "../tsconfig.base.json"
+  "extends": "../../tsconfig.base.json"
 }

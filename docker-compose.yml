@@ -1,0 +1,22 @@
+services:
+  app-1:
+    build:
+      context: .
+      dockerfile: apps/app-1/Dockerfile
+    container_name: nx-app-1
+    ports:
+      - '4200:80'
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  app-2:
+    build:
+      context: .
+      dockerfile: apps/app-2/Dockerfile
+    container_name: nx-app-2
+    ports:
+      - '4201:80'
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped

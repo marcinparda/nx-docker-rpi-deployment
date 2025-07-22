@@ -7,13 +7,13 @@
       "path": "./apps/app-1"
     },
     {
-      "path": "./app-2"
+      "path": "./apps/app-2"
     },
     {
-      "path": "./shared-lib"
+      "path": "./libs/shared-lib"
     },
     {
-      "path": "./app-1-lib"
+      "path": "./libs/app-1-lib"
     }
   ]
 }
