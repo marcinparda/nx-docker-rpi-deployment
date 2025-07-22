@@ -5,6 +5,15 @@
   "references": [
     {
       "path": "./apps/app-1"
+    },
+    {
+      "path": "./app-2"
+    },
+    {
+      "path": "./shared-lib"
+    },
+    {
+      "path": "./app-1-lib"
     }
   ]
 }

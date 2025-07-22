@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
@@ -34,10 +34,7 @@
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
-      "path": "../../app-1-lib/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared-lib/tsconfig.lib.json"
+      "path": "../shared-lib/tsconfig.lib.json"
     }
   ]
 }

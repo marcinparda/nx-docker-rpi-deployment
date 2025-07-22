@@ -2,17 +2,15 @@
 // import styles from './app.module.css';
 import NxWelcome from './nx-welcome';
 import { SharedLib } from '@nx-docker-rpi-deployment/shared-lib';
-import { App1Lib } from '@nx-docker-rpi-deployment/app-1-lib';
 
 import { Route, Routes, Link } from 'react-router-dom';
 
 export function App() {
   return (
     <div>
-      <NxWelcome title="@nx-docker-rpi-deployment/app-1" />
+      <NxWelcome title="@nx-docker-rpi-deployment/app-2" />
 
-      <SharedLib title="App-1" />
-      <App1Lib message="This is a specific component for App-1!" />
+      <SharedLib title="App-2" />
 
       {/* START: routes */}
       {/* These routes and navigation have been generated for you */}
