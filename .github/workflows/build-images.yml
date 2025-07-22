@@ -4,7 +4,7 @@ on:
   workflow_call:
     outputs:
       image_name:
-        description: "The built Docker image name"
+        description: 'The built Docker image name'
         value: ${{ jobs.build-images.outputs.image_name }}
   workflow_dispatch:
 
@@ -39,6 +39,7 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}/nx-multi-app:latest
             ghcr.io/${{ github.repository }}/nx-multi-app:${{ github.sha }}
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
