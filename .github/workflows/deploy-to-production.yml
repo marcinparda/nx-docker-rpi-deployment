@@ -75,6 +75,9 @@ jobs:
           #!/bin/bash
           set -e
 
+          echo "🔑 Logging in to GitHub Container Registry..."
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
           IMAGE_NAME="${{ env.IMAGE_NAME }}"
           CONTAINER_NAME="${{ env.CONTAINER_NAME }}"
 
