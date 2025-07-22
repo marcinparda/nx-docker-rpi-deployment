@@ -17,3 +17,6 @@ jobs:
     uses: ./.github/workflows/deploy-to-production.yml
     with:
       image-name: '${{ needs.build-images.outputs.image_name }}'
+    secrets:
+      CLOUDFLARE_TUNNEL_DOMAIN: ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}
+      API_URL: ${{ secrets.API_URL }}

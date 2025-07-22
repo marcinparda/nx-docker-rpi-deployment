@@ -7,6 +7,11 @@ on:
         description: 'Docker image name to deploy'
         required: false
         type: string
+    secrets:
+      CLOUDFLARE_TUNNEL_DOMAIN:
+        required: true
+      API_URL:
+        required: true
   workflow_dispatch:
     inputs:
       image-name:
