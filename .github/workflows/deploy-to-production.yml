@@ -1,0 +1,28 @@
+name: Deploy to Production 
+
+on:
+  workflow_call:
+    inputs:
+      image-name:
+        description: 'Docker image name to deploy'
+        required: false
+        type: string
+  workflow_dispatch:
+    inputs:
+      image-name:
+        description: 'Docker image name to deploy'
+        required: false
+        type: string
+
+jobs:
+  deploy-to-production:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Production
+        run: |
+          IMAGE_NAME="${{ inputs.image-name || format('ghcr.io/{0}/nx-multi-app:latest', github.repository) }}"
+          echo "🚀 Deploying to production environment..."
+          echo "📦 Using image: $IMAGE_NAME"
+          echo "🔧 Docker pull command: docker pull $IMAGE_NAME"
+          echo "▶️ Docker run command: docker run -d --name nx-multi-app -p 4200:80 -p 4201:81 $IMAGE_NAME"

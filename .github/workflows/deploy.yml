@@ -1,0 +1,19 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml
+
+  build-images:
+    needs: checks
+    uses: ./.github/workflows/build-images.yml
+
+  deploy-to-raspberry:
+    needs: build-images
+    uses: ./.github/workflows/deploy-to-raspberry.yml
+    with:
+      image-name: ${{ needs.build-images.outputs.image_name }}
