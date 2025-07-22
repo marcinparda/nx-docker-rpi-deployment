@@ -109,6 +109,7 @@ jobs:
 
           echo "📤 Copying deployment script to Raspberry Pi..."
           scp deploy.sh ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:~/deploy.sh
+          echo "🔑 Executing deployment script on Raspberry Pi..."
           ssh ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "chmod +x ~/deploy.sh && ~/deploy.sh"
 
           echo "🎉 Deployment to Raspberry Pi completed successfully!"
