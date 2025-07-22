@@ -1,4 +1,4 @@
-name: Deploy to Production 
+name: Deploy to Production
 
 on:
   workflow_call:
@@ -7,6 +7,18 @@ on:
         description: 'Docker image name to deploy'
         required: false
         type: string
+    secrets:
+      RASPBERRY_PI_SSH_KEY:
+        required: true
+      SSH_KNOWN_HOSTS:
+        required: true
+      CLOUDFLARE_TUNNEL_DOMAIN:
+        required: true
+      RASPBERRY_PI_USERNAME:
+        required: true
+      API_URL:
+        description: 'Production API URL for environment configuration'
+        required: true
   workflow_dispatch:
     inputs:
       image-name:
@@ -14,15 +26,140 @@ on:
         required: false
         type: string
 
+env:
+  IMAGE_NAME: ${{ inputs.image-name || format('ghcr.io/{0}/nx-multi-app:latest', github.repository) }}
+  CONTAINER_NAME: nx-multi-app
+  RASPBERRY_PI_HOST: ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}
+
 jobs:
   deploy-to-production:
     runs-on: ubuntu-latest
+    outputs:
+      deployment-status: ${{ steps.deploy.outcome }}
+      image-name: ${{ env.IMAGE_NAME }}
+      deployment-url: ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}
 
     steps:
-      - name: Deploy to Production
+      - name: Setup SSH
+        id: setup-ssh
         run: |
-          IMAGE_NAME="${{ inputs.image-name || format('ghcr.io/{0}/nx-multi-app:latest', github.repository) }}"
-          echo "🚀 Deploying to production environment..."
-          echo "📦 Using image: $IMAGE_NAME"
-          echo "🔧 Docker pull command: docker pull $IMAGE_NAME"
-          echo "▶️ Docker run command: docker run -d --name nx-multi-app -p 4200:80 -p 4201:81 $IMAGE_NAME"
+          echo "🔧 Setting up SSH connection to Raspberry Pi..."
+          mkdir -p ~/.ssh
+          echo "${{ secrets.RASPBERRY_PI_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          echo "✅ SSH setup completed"
+
+      - name: Test SSH Connection
+        id: test-ssh
+        run: |
+          echo "🔍 Testing SSH connection to Raspberry Pi..."
+          ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=yes ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ env.RASPBERRY_PI_HOST }} "echo 'SSH connection successful'"
+          echo "✅ SSH connection test passed"
+
+      - name: Deploy to Raspberry Pi
+        id: deploy
+        run: |
+          echo "🚀 Starting deployment to Raspberry Pi..."
+          echo "📦 Deploying image: ${{ env.IMAGE_NAME }}"
+
+          # Create deployment script
+          cat << 'EOF' > deploy.sh
+          #!/bin/bash
+          set -e
+
+          IMAGE_NAME="${{ env.IMAGE_NAME }}"
+          CONTAINER_NAME="${{ env.CONTAINER_NAME }}"
+          API_URL="${{ secrets.API_URL }}"
+
+          echo "� Stopping existing container if running..."
+          docker stop $CONTAINER_NAME 2>/dev/null || true
+          docker rm $CONTAINER_NAME 2>/dev/null || true
+
+          echo "🗑️ Cleaning up old images..."
+          docker image prune -f
+
+          echo "📥 Pulling latest image..."
+          docker pull $IMAGE_NAME
+
+          echo "� Starting new container..."
+          docker run -d \
+            --name $CONTAINER_NAME \
+            --restart unless-stopped \
+            -p 4200:80 \
+            -p 4201:81 \
+            -e API_URL="$API_URL" \
+            $IMAGE_NAME
+
+          echo "✅ Deployment completed successfully"
+
+          # Verify container is running
+          echo "� Verifying container status..."
+          docker ps --filter "name=$CONTAINER_NAME" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+          # Health check
+          echo "🏥 Performing health check..."
+          sleep 10
+          if docker ps --filter "name=$CONTAINER_NAME" --filter "status=running" | grep -q $CONTAINER_NAME; then
+            echo "✅ Container is running successfully"
+          else
+            echo "❌ Container failed to start"
+            docker logs $CONTAINER_NAME
+            exit 1
+          fi
+          EOF
+
+          # Copy and execute deployment script on Raspberry Pi
+          scp deploy.sh ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ env.RASPBERRY_PI_HOST }}:~/deploy.sh
+          ssh ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ env.RASPBERRY_PI_HOST }} "chmod +x ~/deploy.sh && ~/deploy.sh"
+
+          echo "🎉 Deployment to Raspberry Pi completed successfully!"
+
+      - name: Cleanup SSH
+        if: always()
+        run: |
+          echo "🧹 Cleaning up SSH keys..."
+          rm -f ~/.ssh/id_rsa
+          rm -f deploy.sh
+
+  summary:
+    needs: deploy-to-production
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "# 🚀 Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Deployment Details" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Status** | ${{ needs.deploy-to-production.outputs.deployment-status == 'success' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Image** | \`${{ needs.deploy-to-production.outputs.image-name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Target** | Raspberry Pi via ${{ needs.deploy-to-production.outputs.deployment-url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Workflow** | ${{ github.workflow }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Run ID** | ${{ github.run_id }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Triggered by** | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ needs.deploy-to-production.outputs.deployment-status }}" == "success" ]]; then
+            echo "## 🎉 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Your application has been successfully deployed to the Raspberry Pi." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🔗 Access URLs" >> $GITHUB_STEP_SUMMARY
+            echo "- **App 1**: http://${{ needs.deploy-to-production.outputs.deployment-url }}:4200" >> $GITHUB_STEP_SUMMARY
+            echo "- **App 2**: http://${{ needs.deploy-to-production.outputs.deployment-url }}:4201" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The deployment to Raspberry Pi encountered an error. Please check the logs above for details." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🔧 Troubleshooting Tips" >> $GITHUB_STEP_SUMMARY
+            echo "1. Verify SSH connection and credentials" >> $GITHUB_STEP_SUMMARY
+            echo "2. Check Docker image availability" >> $GITHUB_STEP_SUMMARY
+            echo "3. Ensure Raspberry Pi has sufficient resources" >> $GITHUB_STEP_SUMMARY
+            echo "4. Review container logs on the target system" >> $GITHUB_STEP_SUMMARY
+          fi

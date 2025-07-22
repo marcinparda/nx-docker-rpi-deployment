@@ -100,7 +100,7 @@ npx nx affected --targets=lint,build,test --base=origin/main --head=HEAD
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### Prerequisites (for local and production environments)
 
 - Node.js 20+
 - npm
@@ -111,10 +111,10 @@ npx nx affected --targets=lint,build,test --base=origin/main --head=HEAD
 
 1. **Clone the repository**
 
-   ```bash
-   git clone <repository-url>
-   cd nx-docker-rpi-deployment
-   ```
+```bash
+git clone <repository-url>
+cd nx-docker-rpi-deployment
+```
 
 2. You can try to push some changes to the repository to trigger the CI/CD pipeline in GitHub Actions.
 
@@ -205,6 +205,7 @@ docker run -d --name nx-multi-app -p 4200:80 -p 4201:81 nx-multi-app
 ## 🎯 How to deploy to something different than Raspberry Pi
 
 ### Just edit the `deploy-to-production.yml` workflow file
+
 Remember about using images built by the `build-images.yml` workflow if you will use this step.
 
 ## 🤝 Contributing
