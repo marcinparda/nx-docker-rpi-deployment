@@ -14,6 +14,6 @@ jobs:
 
   deploy-to-raspberry:
     needs: build-images
-    uses: ./.github/workflows/deploy-to-raspberry.yml
+    uses: ./.github/workflows/deploy-to-production.yml
     with:
       image-name: ${{ needs.build-images.outputs.image_name }}
