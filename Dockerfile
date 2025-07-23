@@ -11,7 +11,7 @@ RUN npm ci
 COPY . .
 
 # Build all applications
-RUN npx nx run-many --target=build --configuration=production
+RUN npx nx run-many --target=build --projects=app-1 --configuration=production
 
 # Production stage
 FROM nginx:alpine
