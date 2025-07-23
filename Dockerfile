@@ -17,7 +17,7 @@ RUN npm ci
 COPY . .
 
 # Build all applications
-RUN npx nx run-many --target=build projects=app-1 --configuration=production
+RUN npx nx run-many --target=build --projects=app-1 --configuration=production
 
 # Production stage
 FROM nginx:alpine
@@ -30,3 +30,4 @@ COPY nginx/multi-app.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80 81
 CMD ["nginx", "-g", "daemon off;"]
+ 
