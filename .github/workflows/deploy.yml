@@ -5,7 +5,11 @@ on:
     branches: [main]
 
 jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml
+
   build-images:
+    needs: checks
     uses: ./.github/workflows/build-images.yml
 
   deploy-to-raspberry:
