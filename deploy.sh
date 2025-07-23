@@ -17,7 +17,7 @@ docker stop "$CONTAINER_NAME" 2>/dev/null || true
 docker rm "$CONTAINER_NAME" 2>/dev/null || true
 
 echo "🗑️ Cleaning up old images..."
-docker image prune -f
+docker image prune -a -f
 
 echo "📥 Pulling latest image..."
 docker pull "$IMAGE_NAME"
