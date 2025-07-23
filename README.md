@@ -23,7 +23,7 @@ The project uses GitHub Actions with a focus on Nx's affected commands to optimi
 1. **Code Quality Checks** (`checks.yml`)
 
    - Runs on pull requests to master
-   - Executes `nx affected --targets=lint,build,test` to only check changed projects
+   - Executes `nx affected --targets=lint,build,test` to only check changed projects compared to the main branch so this is more for PRs than pushes to the main branch. Can be changed (and probably would be updated by me at some point) easily in Run affected checks step.
    - Uses Nx's dependency graph to understand what needs testing
 
 2. **Image Building** (`build-images.yml`)
