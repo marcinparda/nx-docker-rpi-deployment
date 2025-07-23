@@ -17,13 +17,14 @@ RUN npm ci
 COPY . .
 
 # Build all applications
-RUN npx nx run-many --target=build --projects=app-1 --configuration=production
+RUN npx nx run-many --target=build --configuration=production
 
 # Production stage
 FROM nginx:alpine
 
 # Copy built files for both apps
 COPY --from=build /app/dist/apps/app-1 /usr/share/nginx/html/app-1
+COPY --from=build /app/dist/apps/app-2 /usr/share/nginx/html/app-2
 
 # Copy custom nginx config that will handle both apps
 COPY nginx/multi-app.conf /etc/nginx/conf.d/default.conf
