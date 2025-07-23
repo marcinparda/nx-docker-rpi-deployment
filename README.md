@@ -1,6 +1,6 @@
 # Nx Docker Production Deployment
 
-This project demonstrates a practical approach to deploying multiple frontend applications from an Nx workspace to production environments (specifically Raspberry Pi) using Docker containers, while maximizing the benefits of Nx's affected features for optimized CI/CD pipelines.
+This project demonstrates a practical approach to deploying multiple frontend applications from an Nx workspace to Raspberry Pi using Docker containers and Cloudflare. Trying to maximize the benefits of Nx's affected features for optimized CI/CD pipelines. The goal is to provide fast and efficient deployment processes that will connect to raspberry pi devices via Cloudflare tunnel for as short as possible time to avoid ssh connection issues.
 
 ## 🎯 Overview
 
@@ -31,10 +31,18 @@ The project uses GitHub Actions with a focus on Nx's affected commands to optimi
    - Builds Docker images with multi-stage builds
    - Pushes to GitHub Container Registry (GHCR)
    - Tags with both `latest` and commit SHA
+   - Logging the build status to GitHub Actions summary
 
 3. **Production Deployment** (`deploy-to-production.yml`)
-   - Deploys to production environment
-   - Provides Docker commands for manual deployment
+   - Setting up access to Raspberry Pi (Cloudflare and SSH)
+   - Copies the `deploy.sh` script to the Raspberry Pi
+   - Running the `deploy.sh` script on the Raspberry Pi
+   - `deploy.sh` script handles:
+     - Pulling the latest Docker images
+     - Stopping and removing existing container
+     - Starting new container with the latest image
+   - Cleans up `~/.ssh/id_rsa` and `deploy.sh` files after deployment
+   - Logging the deployment status to GitHub Actions summary
 
 ### Nx Affected Strategy
 
@@ -49,13 +57,13 @@ The pipeline leverages Nx's affected commands to:
 npx nx affected --targets=lint,build,test --base=origin/main --head=HEAD
 ```
 
-### 📊 Benefits:
+### 📊 Benefits of this development and deployment apprach:
 
 #### ✅ Nx Workspace Benefits
 
 - **Shared libraries** between applications
 - **Consistent tooling** (linting, testing, building)
-- **Dependency graph** understanding for optimal builds
+- **Dependency graph** understanding for optimal builds (nx affected)
 - **Code generation** for consistent project structure
 
 #### ✅ Docker Containerization
@@ -76,51 +84,32 @@ npx nx affected --targets=lint,build,test --base=origin/main --head=HEAD
 - **Multi-app support** in single container
 - **Health checks** and monitoring capabilities
 
-## 📁 Project Structure
-
-```
-├── apps/
-│   ├── app-1/                    # React application #1
-│   └── app-2/                    # React application #2
-├── libs/
-│   ├── app-1-lib/               # Library specific to app-1
-│   └── shared-lib/              # Shared library between app-1 and app-2
-├── nginx/
-│   ├── multi-app.conf           # Nginx config for multi-app setup
-│   └── single-port.conf         # Alternative single-port config
-├── .github/workflows/
-│   ├── build-images.yml         # Docker image build workflow
-│   ├── checks.yml               # Code quality checks (lint, test, build)
-│   ├── deploy-to-production.yml # Production deployment workflow
-│   └── deploy.yml               # Main deployment orchestration
-├── docker-compose.yml           # Local development setup
-├── Dockerfile                   # Multi-stage Docker build
-└── nx.json                      # Nx workspace configuration
-```
-
 ## 🚀 Getting Started
 
-### Prerequisites (for local and production environments)
+### Production Deployment
 
-- Node.js 20+
-- npm
-- Docker (for containerization)
-- Docker Compose (for local development)
+#### Pre-requisites
 
-### Installation (Local Development)
+- Raspberry Pi with Docker installed
+- Cloudflare Tunnel set up for remote access
 
-1. **Clone the repository**
+#### Testing the example
 
-```bash
-git clone <repository-url>
-cd nx-docker-rpi-deployment
-```
+1. Fork or clone the repository.
 
-2. You can try to push some changes to the repository to trigger the CI/CD pipeline in GitHub Actions.
+2. Setup the environments
+   For deployment on GitHub actions you need to setup your repository with these actions secrets configured:
 
-### 🚨 Troubleshooting
+- `CLOUDFLARE_TUNNEL_DOMAIN`: The domain for your Cloudflare tunnel
+- `RASPBERRY_PI_USERNAME`: The SSH username for your Raspberry Pi
+- `RASPBERRY_PI_SSH_KEY`: The private SSH key for your Raspberry Pi
+- `SSH_KNOWN_HOSTS`: The known hosts file from your Raspberry Pi
 
-#### GitHub Actions Package Publishing Issues
+3. You can try to push some changes to the repository to trigger the CI/CD pipeline in GitHub Actions.
+
+#### 🚨 Troubleshooting
+
+**GitHub Actions Package Publishing Issues**
 
 If you encounter the error:
 
@@ -138,9 +127,49 @@ buildx failed with: ERROR: failed to build: failed to solve: failed to push ghcr
    - Check "Allow GitHub Actions to create and approve pull requests"
    - Save the changes
 
-## 🐳 Using this example for your project
+### Local Development
 
-### Configuration
+#### Pre-requisites
+
+- Node.js 20+
+- npm
+- Docker (for containerization)
+- Docker Compose (for local development)
+
+#### Installation
+
+1. Clone the repository
+
+   ```bash
+   git clone <repository-url>
+   cd nx-docker-rpi-deployment
+   ```
+
+2. Install dependencies
+
+   ```bash
+   npm ci
+   ```
+
+3. Start development servers
+
+   ```bash
+   # Start both apps in development mode
+   npx nx serve app-1
+   npx nx serve app-2
+
+   # Or run in parallel
+   npx nx run-many --target=serve --projects=app-1,app-2
+   ```
+
+#### Docker Start Command
+
+```bash
+# Local development
+docker-compose up --build
+```
+
+## 🐳 Configuration
 
 When using this example for your own Nx workspace, you may need to adjust the following:
 
@@ -166,46 +195,13 @@ When using this example for your own Nx workspace, you may need to adjust the fo
 - In `build-images.yml` adjust platforms if you need to support different architectures (e.g. `linux/amd64,linux/arm64`), you can remove the `platforms` line if you want to build only for the current architecture which is usually the best option if you don't have a specific need for multi-architecture builds. In this example I am deploying to Raspberry Pi which requires `linux/arm64` support.
 - When using the `deploy-to-production.yml`, use the images built by the `build-images.yml` workflow
 
-### Installation (Local Development)
+5. **Update Deployment Script**
 
-1. **Clone the repository**
-
-   ```bash
-   git clone <repository-url>
-   cd nx-docker-rpi-deployment
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm ci
-   ```
-
-3. **Start development servers**
-
-   ```bash
-   # Start both apps in development mode
-   npx nx serve app-1
-   npx nx serve app-2
-
-   # Or run in parallel
-   npx nx run-many --target=serve --projects=app-1,app-2
-   ```
-
-### Docker Commands
-
-```bash
-# Local development
-docker-compose up --build
-
-# Production deployment
-docker build -t nx-multi-app .
-docker run -d --name nx-multi-app -p 4200:80 -p 4201:81 nx-multi-app
-```
+- Modify `deploy.sh` to suit your deployment needs
 
 ## 🎯 How to deploy to something different than Raspberry Pi
 
-### Just edit the `deploy-to-production.yml` workflow file
+Just edit the `deploy-to-production.yml` workflow file
 
 Remember about using images built by the `build-images.yml` workflow if you will use this step.
 
