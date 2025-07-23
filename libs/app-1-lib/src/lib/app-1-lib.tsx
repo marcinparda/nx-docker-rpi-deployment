@@ -8,7 +8,7 @@ export function App1Lib(props: App1LibProps) {
   return (
     <div className={styles['container']}>
       <h1>App-1 Specific Component</h1>
-      <h2>check-pipeline-on-pr</h2>
+      <h2>Final Flash!</h2>
       <p>{props.message || 'This component is specific to App-1!'}</p>
     </div>
   );
