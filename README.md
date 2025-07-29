@@ -144,13 +144,13 @@ npx nx affected --targets=lint,build,test --base=<last-successful-sha> --head=HE
 If you encounter the error:
 
 ```
-buildx failed with: ERROR: failed to build: failed to solve: failed to push ghcr.io/marcinparda/nx-docker-rpi-deployment/nx-multi-app:latest: denied: installation not allowed to Create organization package
+buildx failed with: ERROR: failed to build: failed to solve: failed to push ghcr.io/<owner>/<repo>/nx-multi-app:latest: denied: installation not allowed to Create organization package
 ```
 
 **Solution: Enable Package Permissions**
 
 1. Go to your repository settings:
-   - Navigate to `https://github.com/marcinparda/nx-docker-rpi-deployment/settings`
+   - Navigate to `https://github.com/<owner>/<repo>/settings`
    - Go to `Actions → General`
    - Scroll down to "Workflow permissions"
    - Select "Read and write permissions"
@@ -212,6 +212,7 @@ When using this example for your own Nx workspace, you may need to adjust the fo
    - When using the `deploy-to-production.yml`, use the images built by the main workflow
 4. **Update Deployment Script**
    - Modify `deploy.sh` to suit your deployment needs
+   - Adjust repo and owner variables
 
 ## 🎯 How to Deploy to a Different Target Than Raspberry Pi
 

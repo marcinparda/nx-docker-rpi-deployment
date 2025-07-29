@@ -11,7 +11,7 @@ if [[ -z "$GITHUB_TOKEN" || -z "$GITHUB_ACTOR" ]]; then
 fi
 
 OWNER="${OWNER:-marcinparda}"
-REPO="${REPO:-cockpit-app}"
+REPO="${REPO:-nx-docker-rpi-deployment}"
 
 echo "🔑 Logging in to GitHub Container Registry..."
 echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
