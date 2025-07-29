@@ -12,7 +12,7 @@ This repository uses several GitHub Actions workflows to automate validation, ty
 ### 1. Checks Workflow (`checks.yml`)
 
 - **File:** `.github/workflows/checks.yml`
-- **Purpose:** Runs on every pull request to `master` and on workflow calls. It:
+- **Purpose:** Runs on every pull request to `main` and on workflow calls. It:
   - Installs dependencies
   - Finds the last successful deploy SHA
   - Runs `nx affected` for lint, build, and test on only changed projects
@@ -21,7 +21,7 @@ This repository uses several GitHub Actions workflows to automate validation, ty
 ### 2. Deployment Workflow (`deploy.yml` & `deploy-to-production.yml`)
 
 - **File:** `.github/workflows/deploy.yml`
-- **Purpose:** Handles CI/CD for all apps in the monorepo. On every push to `master`, it:
+- **Purpose:** Handles CI/CD for all apps in the monorepo. On every push to `main`, it:
 
   - Validates API types (calls `validate-types.yml`)
   - Runs affected checks and builds (lint, build, test) only for changed projects

@@ -1,6 +1,5 @@
 # Nx Docker Production Deployment
 
-
 This project demonstrates a practical approach to deploying multiple frontend applications from an Nx workspace to Raspberry Pi using Docker containers and Cloudflare. It maximizes the benefits of Nx's affected features for optimized CI/CD pipelines. The deployment process is automated using GitHub Actions workflows, which leverage Nx's dependency graph to only build, test, and deploy affected projects, resulting in fast and efficient deployments. The deployment to Raspberry Pi is performed via a secure Cloudflare tunnel and SSH, with Docker containers managed by a robust deployment script.
 
 ## 🎯 Overview
@@ -35,7 +34,8 @@ This project uses several GitHub Actions workflows to automate validation, type 
 #### 2. **Deployment Workflow (`deploy.yml` & `deploy-to-production.yml`)**
 
 - **`deploy.yml`:**
-  - **Runs on:** Every push to `master`
+
+  - **Runs on:** Every push to `main`
   - **Purpose:**
     - Replaces dev URLs with production URLs in environment files
     - Installs dependencies
@@ -90,41 +90,45 @@ The pipeline leverages Nx's affected commands to:
 npx nx affected --targets=lint,build,test --base=<last-successful-sha> --head=HEAD
 ```
 
-
 ### 📊 Benefits of this Development and Deployment Approach
 
-
 #### ✅ Nx Workspace Benefits
+
 - **Shared libraries** between applications
 - **Consistent tooling** (linting, testing, building)
 - **Dependency graph** understanding for optimal builds (nx affected)
 - **Code generation** for consistent project structure
 
 #### ✅ Docker Containerization
+
 - **Environment consistency** from development to production
 - **Easy deployment** to any Docker-supported platform
 - **Resource isolation** and scaling capabilities
 
 #### ✅ Optimized CI/CD
+
 - **Affected-only builds** reduce pipeline time
 - **Automatic testing** of dependency chains
 - **Container registry integration** with GHCR
 
 #### ✅ Production-Ready
+
 - **Nginx optimization** for static file serving
 - **Multi-app support** in single container
 - **Health checks** and monitoring capabilities
-
 
 ## 🚀 Getting Started
 
 ### Production Deployment
 
 #### Pre-requisites
+
 - Raspberry Pi with Docker installed
 - Cloudflare Tunnel set up for remote access
 
 #### Setup
+
+0. Make sure you are using main as the default branch in your repository. If you use master or other named branches, you may need to adjust the workflows accordingly.
 1. Fork or clone the repository.
 2. Set up the following GitHub Actions secrets in your repository:
    - `CLOUDFLARE_TUNNEL_DOMAIN`: The domain for your Cloudflare tunnel
@@ -153,16 +157,17 @@ buildx failed with: ERROR: failed to build: failed to solve: failed to push ghcr
    - Check "Allow GitHub Actions to create and approve pull requests"
    - Save the changes
 
-
 ### Local Development
 
 #### Pre-requisites
+
 - Node.js 20+
 - npm
 - Docker (for containerization)
 - Docker Compose (for local development)
 
 #### Installation
+
 1. Clone the repository
    ```bash
    git clone <repository-url>
@@ -173,6 +178,7 @@ buildx failed with: ERROR: failed to build: failed to solve: failed to push ghcr
    npm ci
    ```
 3. Start development servers
+
    ```bash
    # Start both apps in development mode
    npx nx serve app-1
@@ -183,11 +189,11 @@ buildx failed with: ERROR: failed to build: failed to solve: failed to push ghcr
    ```
 
 #### Docker Start Command
+
 ```bash
 # Local development
 docker-compose up --build
 ```
-
 
 ## 🐳 Configuration
 
@@ -207,15 +213,14 @@ When using this example for your own Nx workspace, you may need to adjust the fo
 4. **Update Deployment Script**
    - Modify `deploy.sh` to suit your deployment needs
 
-
 ## 🎯 How to Deploy to a Different Target Than Raspberry Pi
 
 Edit the `deploy-to-production.yml` workflow file to suit your target environment. Remember to use images built by the main workflow for deployment.
 
-
 ## 🤝 Contributing
 
 This is a personal example project, but suggestions and improvements are welcome! Feel free to:
+
 - Open issues for questions or suggestions
 - Submit pull requests for improvements
 - Share your own deployment strategies
@@ -226,4 +231,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Note**: This approach represents my current deployment strategy and has proven effective for my use cases. While it may not be the optimal solution for every scenario, it successfully combines Nx's powerful affected features with Docker's containerization benefits for efficient CI/CD pipelines. 
+**Note**: This approach represents my current deployment strategy and has proven effective for my use cases. While it may not be the optimal solution for every scenario, it successfully combines Nx's powerful affected features with Docker's containerization benefits for efficient CI/CD pipelines.

@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   build-test-and-push:
@@ -54,9 +54,9 @@ jobs:
           LAST_SUCCESSFUL_SHA=$(jq -r '.[0].headSha // empty' result.json)
 
           if [ -z "$LAST_SUCCESSFUL_SHA" ]; then
-            echo "⚠️ No successful run found. Falling back to origin/master"
-            git fetch origin master
-            LAST_SUCCESSFUL_SHA=$(git rev-parse origin/master)
+            echo "⚠️ No successful run found. Falling back to origin/main"
+            git fetch origin main
+            LAST_SUCCESSFUL_SHA=$(git rev-parse origin/main)
           fi
 
           echo "🔍 Last successful/known good SHA for affected check: $LAST_SUCCESSFUL_SHA"
