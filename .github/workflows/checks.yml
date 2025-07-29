@@ -46,7 +46,7 @@ jobs:
           echo "Resolved last successful/known good SHA: $LAST_SUCCESSFUL_SHA"
           echo "LAST_SUCCESSFUL_SHA=$LAST_SUCCESSFUL_SHA" >> $GITHUB_ENV
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed for gh CLI to access workflow runs
 
       - name: Debug last commit
         run: |
