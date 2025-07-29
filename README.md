@@ -226,4 +226,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Note**: This approach represents my current deployment strategy and has proven effective for my use cases. While it may not be the optimal solution for every scenario, it successfully combines Nx's powerful affected features with Docker's containerization benefits for efficient CI/CD pipelines.
+**Note**: This approach represents my current deployment strategy and has proven effective for my use cases. While it may not be the optimal solution for every scenario, it successfully combines Nx's powerful affected features with Docker's containerization benefits for efficient CI/CD pipelines. 
