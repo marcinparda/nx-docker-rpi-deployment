@@ -53,4 +53,4 @@ jobs:
           echo "🔍 Last base SHA for affected check: $LAST_SUCCESSFUL_SHA"
 
       - name: Run affected checks
-        run: npx nx affected --targets=lint,build,test --base=$LAST_SUCCESSFUL_SHA --head=HEAD
+        run: npx nx affected --targets=lint,build,test --base=$LAST_SUCCESSFUL_SHA --head=HEAD --parallel=4
